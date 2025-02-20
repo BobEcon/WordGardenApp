@@ -71,13 +71,17 @@ struct ContentView: View {
                             guessedLetter = String(lastChar).uppercased()
                         }
                         .focused($textFieldIsFocused)
+                        .onSubmit {
+                            guard guessedLetter != "" else {
+                                return
+                            }
+                            guessALetter()
+                            updateGamePLay()
+                        }
                     
                     Button("Guess a Letter:") {
-                        //TODO: Guess a Letter button action here
-                        lettersGuessed += guessedLetter
-                        revealedWord = wordToGuess.map {letter in lettersGuessed.contains(letter) ? "\(letter)" : "_"}.joined(separator: " ")
-//                        textFieldIsFocused = false
-                        guessedLetter = ""
+                        guessALetter()
+                        updateGamePLay()
                     }
                     .buttonStyle(.bordered)
                     .tint(.mint)
@@ -104,6 +108,18 @@ struct ContentView: View {
             revealedWord = "_" + String(repeating: " _", count: wordToGuess.count-1)
         }
         //        .border(Color.gray)
+    }
+    
+    func guessALetter() {
+        textFieldIsFocused = false
+        lettersGuessed += guessedLetter
+        revealedWord = wordToGuess.map {letter in lettersGuessed.contains(letter) ? "\(letter)" : "_"}.joined(separator: " ")
+        guessedLetter = ""
+    }
+    
+    func updateGamePLay() {
+        //TODO: Redo this with LocalisedStringKey & Inflect
+        gameStatusMessage = "You've Made \(lettersGuessed.count) Guess\(lettersGuessed.count == 1 ? "" : "es")"
     }
 }
 
