@@ -10,13 +10,16 @@ import SwiftUI
 struct ContentView: View {
     @State private var wordsGuessed = 0
     @State private var wordsMissed = 0
-    @State private var wordsToGuess = ["SWIFT", "DOG", "CAT"] // All Caps
     @State private var gameStatusMessage = "How Many Guesses to Uncover the Hidden Word?"
-    @State private var currentWord = 0
+    @State private var currentWordIndex = 0
+    @State private var wordToGuess = ""
+    @State private var revealedWord = ""
+    @State private var lettersGuessed = ""
     @State private var guessedLetter = ""
     @State private var imageName = "flower8"
     @State private var playAgainHidden = true
     @FocusState private var textFieldIsFocused: Bool
+    private let wordsToGuess = ["SWIFT", "DOG", "CAT"] // All Caps
     
     var body: some View {
         VStack {
@@ -32,7 +35,7 @@ struct ContentView: View {
                 }
             }
             .padding(.horizontal)
-//            .border(Color.gray)
+            //            .border(Color.gray)
             
             Spacer()
             
@@ -40,10 +43,10 @@ struct ContentView: View {
                 .font(.title)
                 .multilineTextAlignment(.center)
                 .padding()
-//                .border(Color.gray)
+            //                .border(Color.gray)
             
             //TODO: Switch to wordsToGuess[currentWord]
-            Text("_ _ _ _ _")
+            Text(revealedWord)
                 .font(.title)
             
             if playAgainHidden {
@@ -68,10 +71,13 @@ struct ContentView: View {
                             guessedLetter = String(lastChar).uppercased()
                         }
                         .focused($textFieldIsFocused)
-                
+                    
                     Button("Guess a Letter:") {
                         //TODO: Guess a Letter button action here
-                        textFieldIsFocused = false
+                        lettersGuessed += guessedLetter
+                        revealedWord = wordToGuess.map {letter in lettersGuessed.contains(letter) ? "\(letter)" : "_"}.joined(separator: " ")
+//                        textFieldIsFocused = false
+                        guessedLetter = ""
                     }
                     .buttonStyle(.bordered)
                     .tint(.mint)
@@ -79,12 +85,12 @@ struct ContentView: View {
                 }
             } else {
                 Button("Another Word?") {
-                    //TODO: Anotherm Word Button action here
+                    //TODO: Another Word Button action here
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.mint)
             }
-                
+            
             Spacer()
             
             Image(imageName)
@@ -92,7 +98,12 @@ struct ContentView: View {
                 .scaledToFit()
         }
         .ignoresSafeArea(edges: .bottom)
-//        .border(Color.gray)
+        .onAppear {
+            wordToGuess = wordsToGuess[currentWordIndex]
+            // CREATE A STRING FROM A REPEATING VALUE
+            revealedWord = "_" + String(repeating: " _", count: wordToGuess.count-1)
+        }
+        //        .border(Color.gray)
     }
 }
 
