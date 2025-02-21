@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    private static let maximumGuesses = 8 // Need to refer to this as Self.maximumGuesses (cos it's a type property)
     @State private var wordsGuessed = 0
     @State private var wordsMissed = 0
     @State private var gameStatusMessage = "How Many Guesses to Uncover the Hidden Word?"
@@ -15,6 +16,7 @@ struct ContentView: View {
     @State private var wordToGuess = ""
     @State private var revealedWord = ""
     @State private var lettersGuessed = ""
+    @State private var guessesRemaining = maximumGuesses
     @State private var guessedLetter = ""
     @State private var imageName = "flower8"
     @State private var playAgainHidden = true
@@ -35,15 +37,17 @@ struct ContentView: View {
                 }
             }
             .padding(.horizontal)
-            //            .border(Color.gray)
+//                        .border(Color.gray)
             
             Spacer()
             
             Text(gameStatusMessage)
                 .font(.title)
                 .multilineTextAlignment(.center)
+                .frame(height: 80)
+                .minimumScaleFactor(0.5)
                 .padding()
-            //                .border(Color.gray)
+//                            .border(Color.gray)
             
             //TODO: Switch to wordsToGuess[currentWord]
             Text(revealedWord)
@@ -114,12 +118,29 @@ struct ContentView: View {
         textFieldIsFocused = false
         lettersGuessed += guessedLetter
         revealedWord = wordToGuess.map {letter in lettersGuessed.contains(letter) ? "\(letter)" : "_"}.joined(separator: " ")
-        guessedLetter = ""
     }
     
     func updateGamePLay() {
-        //TODO: Redo this with LocalisedStringKey & Inflect
-        gameStatusMessage = "You've Made \(lettersGuessed.count) Guess\(lettersGuessed.count == 1 ? "" : "es")"
+        if !wordToGuess.contains(guessedLetter) {
+            guessesRemaining -= 1
+            imageName = "flower\(guessesRemaining)"
+        }
+        // When Do We PLay Another Word?
+        if !revealedWord.contains("_") {
+            gameStatusMessage = "You Guessed It! It Took You \(lettersGuessed.count) Guesses to Guess the Word"
+            wordsGuessed += 1
+            currentWordIndex += 1
+            playAgainHidden = false
+        } else if guessesRemaining == 0 {
+            gameStatusMessage = "So Sorry, You're All Out of Guesses"
+            wordsMissed += 1
+            currentWordIndex += 1
+            playAgainHidden = false
+        } else {
+            //TODO: Redo this with LocalisedStringKey & Inflect
+            gameStatusMessage = "You've Made \(lettersGuessed.count) Guess\(lettersGuessed.count == 1 ? "" : "es")"
+        }
+        guessedLetter = ""
     }
 }
 
