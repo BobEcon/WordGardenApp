@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var guessedLetter = ""
     @State private var imageName = "flower8"
     @State private var playAgainHidden = true
+    @State private var playAgainButtonLabel = "Another Word?"
     @FocusState private var textFieldIsFocused: Bool
     private let wordsToGuess = ["SWIFT", "DOG", "CAT"] // All Caps
     
@@ -92,8 +93,22 @@ struct ContentView: View {
                     .disabled(guessedLetter.isEmpty)
                 }
             } else {
-                Button("Another Word?") {
-                    //TODO: Another Word Button action here
+                Button(playAgainButtonLabel) {
+                    // if all of the words have been guessed ...
+                    if currentWordIndex == wordsToGuess.count {
+                        currentWordIndex = 0
+                        wordsGuessed = 0
+                        wordsMissed = 0
+                        playAgainButtonLabel = "Another Word"
+                    }
+                    //Reset after a word was guessed or missed
+                    wordToGuess = wordsToGuess[currentWordIndex]
+                    revealedWord = "_" + String(repeating: " _", count: wordToGuess.count-1)
+                    lettersGuessed = ""
+                    gameStatusMessage = "How Many Guesses to Uncover the Hidden Word?"
+                    guessesRemaining = Self.maximumGuesses
+                    imageName = "flower8"
+                    playAgainHidden = true
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.mint)
@@ -140,6 +155,12 @@ struct ContentView: View {
             //TODO: Redo this with LocalisedStringKey & Inflect
             gameStatusMessage = "You've Made \(lettersGuessed.count) Guess\(lettersGuessed.count == 1 ? "" : "es")"
         }
+        
+        if currentWordIndex >= wordsToGuess.count {
+            playAgainButtonLabel = "Restart Game?"
+            gameStatusMessage = gameStatusMessage + "\nYou've Tried All of the Words. Restart from the Beginning?"
+        }
+        
         guessedLetter = ""
     }
 }
