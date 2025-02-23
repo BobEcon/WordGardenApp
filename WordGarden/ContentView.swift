@@ -119,6 +119,7 @@ struct ContentView: View {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
+                .animation(.easeIn(duration: 0.75), value: imageName)
         }
         .ignoresSafeArea(edges: .bottom)
         .onAppear {
@@ -138,7 +139,13 @@ struct ContentView: View {
     func updateGamePLay() {
         if !wordToGuess.contains(guessedLetter) {
             guessesRemaining -= 1
-            imageName = "flower\(guessesRemaining)"
+            // Animate crumbling leaf and play the incorrect sound
+            imageName = "wilt\(guessesRemaining)"
+            // Delay change to flower image until wilt animation is done
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                imageName = "flower\(guessesRemaining)"
+            }
+           
         }
         // When Do We PLay Another Word?
         if !revealedWord.contains("_") {
